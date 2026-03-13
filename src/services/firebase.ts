@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FirebaseOptions, getApp, getApps, initializeApp } from 'firebase/app';
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -365,6 +366,17 @@ export async function addMemory(memory: MemoryInput): Promise<Memory> {
     createdAtServer: serverTimestamp(),
   });
   return memoryDoc;
+}
+
+export async function updateMemory(
+  memoryId: string,
+  memory: Partial<Pick<Memory, 'title' | 'description' | 'date' | 'imageUrl'>>,
+): Promise<void> {
+  await updateDoc(doc(firestore, 'memories', memoryId), memory);
+}
+
+export async function deleteMemory(memoryId: string): Promise<void> {
+  await deleteDoc(doc(firestore, 'memories', memoryId));
 }
 
 export async function getMemories(relationshipId: string): Promise<Memory[]> {

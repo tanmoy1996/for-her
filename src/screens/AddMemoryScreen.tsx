@@ -2,8 +2,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
+import { CommonActions } from '@react-navigation/native';
 import dayjs from 'dayjs';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -21,21 +22,36 @@ import * as ImagePicker from 'expo-image-picker';
 import { RootStackParamList } from '../../App';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useSharedAccount } from '../hooks/useSharedAccount';
-import { addMemory, uploadImage } from '../services/firebase';
+import { addMemory, updateMemory, uploadImage } from '../services/firebase';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddMemory'>;
 
-export function AddMemoryScreen({ navigation }: Props) {
+export function AddMemoryScreen({ navigation, route }: Props) {
   const scrollViewRef = useRef<ScrollView>(null);
   const { session } = useSharedAccount();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const memoryToEdit = route.params?.memory;
+  const isEditing = Boolean(memoryToEdit);
+  const [title, setTitle] = useState(memoryToEdit?.title ?? '');
+  const [description, setDescription] = useState(memoryToEdit?.description ?? '');
+  const [selectedDate, setSelectedDate] = useState(
+    memoryToEdit ? dayjs(memoryToEdit.date).toDate() : new Date(),
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(memoryToEdit?.imageUrl ?? null);
   const [isPickingImage, setIsPickingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!memoryToEdit) {
+      return;
+    }
+
+    setTitle(memoryToEdit.title);
+    setDescription(memoryToEdit.description);
+    setSelectedDate(dayjs(memoryToEdit.date).toDate());
+    setImageUri(memoryToEdit.imageUrl || null);
+  }, [memoryToEdit]);
 
   const pickImage = async () => {
     try {
@@ -92,7 +108,61 @@ export function AddMemoryScreen({ navigation }: Props) {
       setIsSaving(true);
       setErrorMessage(null);
 
-      const imageUrl = imageUri ? await uploadImage(imageUri) : '';
+      let imageUrl = imageUri ?? '';
+
+      if (imageUri && !imageUri.startsWith('http')) {
+        imageUrl = await uploadImage(imageUri);
+      }
+
+      if (isEditing && memoryToEdit) {
+        const updatedMemory = {
+          ...memoryToEdit,
+          title: title.trim(),
+          description: description.trim(),
+          date: dayjs(selectedDate).format('YYYY-MM-DD'),
+          imageUrl,
+        };
+
+        await updateMemory(memoryToEdit.id, {
+          title: updatedMemory.title,
+          description: updatedMemory.description,
+          date: updatedMemory.date,
+          imageUrl: updatedMemory.imageUrl,
+        });
+
+        navigation.dispatch((state) => {
+          const routes = state.routes
+            .slice(0, -1)
+            .map((item) => {
+              const routeParams = item.params;
+              const hasMemoryParam =
+                routeParams &&
+                typeof routeParams === 'object' &&
+                'memory' in routeParams &&
+                routeParams.memory;
+
+              if (
+                item.name === 'MemoryDetail' &&
+                hasMemoryParam &&
+                routeParams.memory.id === memoryToEdit.id
+              ) {
+                return {
+                  ...item,
+                  params: { memory: updatedMemory },
+                };
+              }
+
+              return item;
+            });
+
+          return CommonActions.reset({
+            ...state,
+            routes,
+            index: routes.length - 1,
+          });
+        });
+        return;
+      }
 
       await addMemory({
         relationshipId: session.relationshipId,
@@ -141,7 +211,7 @@ export function AddMemoryScreen({ navigation }: Props) {
             <View style={styles.backButtonSpacer} />
           </View>
 
-          <Text style={styles.title}>Add Memory</Text>
+          <Text style={styles.title}>{isEditing ? 'Edit Memory' : 'Add Memory'}</Text>
 
           <Pressable onPress={pickImage}>
             {isPickingImage ? (
@@ -240,7 +310,9 @@ export function AddMemoryScreen({ navigation }: Props) {
             {isSaving ? (
               <ActivityIndicator color="#ffffff" />
             ) : (
-              <Text style={styles.saveButtonText}>Save Memory</Text>
+              <Text style={styles.saveButtonText}>
+                {isEditing ? 'Update Memory' : 'Save Memory'}
+              </Text>
             )}
           </Pressable>
         </ScrollView>

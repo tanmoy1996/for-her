@@ -1,38 +1,59 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  PlayfairDisplay_600SemiBold,
+  PlayfairDisplay_700Bold,
+  useFonts,
+} from '@expo-google-fonts/playfair-display';
 import dayjs from 'dayjs';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { RootStackParamList } from '../../App';
 import { ScreenContainer } from '../components/ScreenContainer';
 
+const landingImage = require('../assets/image/landingImage.png');
+
 type Props = NativeStackScreenProps<RootStackParamList, 'Landing'>;
 
 export function LandingScreen({ navigation }: Props) {
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_700Bold,
+  });
   const relationshipStartDate = dayjs('2024-01-01');
-  const daysTogether = dayjs().startOf('day').diff(relationshipStartDate.startOf('day'), 'day') + 1;
+  const daysTogether =
+    dayjs().startOf('day').diff(relationshipStartDate.startOf('day'), 'day') +
+    1;
 
   return (
     <ScreenContainer>
       <View style={styles.content}>
-        <Text style={styles.title}>For Her ❤️</Text>
-        <Text style={styles.subtitle}>A little place for our memories</Text>
-
-        <View style={styles.infoCard}>
-          <Text style={styles.infoLabel}>Relationship Started</Text>
-          <Text style={styles.infoValue}>{relationshipStartDate.format('MMMM D, YYYY')}</Text>
+        <View style={styles.imageFrame}>
+          <Image
+            source={landingImage}
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
         </View>
 
-        <View style={styles.infoCard}>
-          <Text style={styles.infoLabel}>Days together</Text>
-          <Text style={styles.daysValue}>{daysTogether}</Text>
-        </View>
+        <Text style={[styles.title, fontsLoaded && styles.titleFont]}>
+          For Her 🦋
+        </Text>
+        <Text style={[styles.subtitle, fontsLoaded && styles.subtitleFont]}>
+          A little place for our memories
+        </Text>
 
-        <Pressable style={styles.button} onPress={() => navigation.navigate('SignIn')}>
+        <Pressable
+          style={styles.button}
+          onPress={() => navigation.navigate('SignIn')}
+        >
           <Text style={styles.buttonText}>Sign In</Text>
         </Pressable>
 
-        <Pressable style={styles.secondaryButton} onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.secondaryButtonText}>Create Account</Text>
+        <Pressable onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.footerLink}>
+            Need an account?{' '}
+            <Text style={styles.footerLinkStrong}>Sign up</Text>
+          </Text>
         </Pressable>
       </View>
     </ScreenContainer>
@@ -42,92 +63,97 @@ export function LandingScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
     gap: 14,
-    backgroundColor: '#fff1f6',
-    borderRadius: 24,
-    paddingHorizontal: 20,
-    paddingVertical: 28,
-    borderWidth: 1,
-    borderColor: '#f4dce8',
-    shadowColor: '#d58ca8',
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 24,
   },
   title: {
     fontSize: 36,
     fontWeight: '700',
-    color: '#4b3f44',
-    textAlign: 'center',
+    color: '#2a1f1c',
+    // lineHeight: 15,
+  },
+  titleFont: {
+    fontFamily: 'PlayfairDisplay_700Bold',
+    fontWeight: '400',
+  },
+  imageFrame: {
+    // width: '100%',
+    height: 350,
+    marginBottom: 8,
+    marginLeft: -24,
+    marginRight: -24,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
   },
   subtitle: {
     fontSize: 18,
-    color: '#76656d',
-    lineHeight: 22,
-    textAlign: 'center',
-    marginBottom: 8,
+    color: '#9b9491',
+    lineHeight: 24,
+    marginBottom: 14,
+  },
+  subtitleFont: {
+    fontFamily: 'PlayfairDisplay_600SemiBold',
+    fontWeight: '400',
   },
   infoCard: {
     width: '100%',
-    backgroundColor: '#fff8fb',
-    borderRadius: 16,
+    backgroundColor: '#fbfaf9',
+    borderRadius: 24,
     paddingVertical: 14,
     paddingHorizontal: 16,
-    alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#f4dce8',
-    shadowColor: '#e2abc0',
-    shadowOpacity: 0.14,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    borderColor: '#e5d8d3',
+    shadowColor: '#c8bbb7',
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   infoLabel: {
     fontSize: 14,
-    color: '#8b7480',
+    color: '#998983',
     marginBottom: 4,
   },
   infoValue: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4b3f44',
+    color: '#2e2320',
   },
   daysValue: {
     fontSize: 30,
     fontWeight: '800',
-    color: '#d16586',
+    color: '#ef8a8e',
   },
   button: {
     marginTop: 8,
-    backgroundColor: '#ee90ad',
+    backgroundColor: '#ef8a8e',
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderRadius: 999,
-    shadowColor: '#cb6788',
+    shadowColor: '#de8c87',
     shadowOpacity: 0.28,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
   },
-  secondaryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 22,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#ecc4d3',
-    backgroundColor: '#fffafd',
+  footerLink: {
+    textAlign: 'center',
+    color: '#8d7f79',
+    marginTop: 10,
+    fontSize: 14,
   },
-  secondaryButtonText: {
-    color: '#8f6d7b',
-    fontSize: 15,
+  footerLinkStrong: {
+    color: '#f08d8f',
     fontWeight: '700',
   },
 });

@@ -63,10 +63,8 @@ function AppNavigator() {
       <Stack.Navigator
         initialRouteName={session ? 'Timeline' : 'Landing'}
         screenOptions={{
-          headerStyle: { backgroundColor: '#fff9fb' },
-          headerShadowVisible: false,
-          headerTitleStyle: { color: '#4f3d46', fontWeight: '700' },
-          contentStyle: { backgroundColor: '#fff9fb' },
+          headerShown: false,
+          contentStyle: { backgroundColor: '#efd5c6' },
           animation: 'fade_from_bottom',
         }}
       >

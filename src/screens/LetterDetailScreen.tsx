@@ -21,26 +21,26 @@ export function LetterDetailScreen({ route }: Props) {
 
 const styles = StyleSheet.create({
   content: {
-    backgroundColor: '#fff4f9',
-    borderRadius: 20,
+    backgroundColor: '#fbfaf9',
+    borderRadius: 24,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#f4dce8',
-    shadowColor: '#d58ca8',
-    shadowOpacity: 0.18,
+    borderColor: '#e5d8d3',
+    shadowColor: '#c8bbb7',
+    shadowOpacity: 0.22,
     shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#4f3d46',
+    color: '#2d221f',
     marginBottom: 14,
   },
   message: {
     fontSize: 16,
-    color: '#5e4d56',
+    color: '#655853',
     lineHeight: 26,
   },
 });

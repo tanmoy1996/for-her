@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { ScreenContainer } from './ScreenContainer';
 
 type AuthShellProps = PropsWithChildren<{
   eyebrow: string;
@@ -32,65 +33,35 @@ export function AuthShell({
   brandLabel = 'For Her',
 }: AuthShellProps) {
   return (
-    <View style={styles.screen}>
-      <View style={styles.topLineOne} />
-      <View style={styles.topLineTwo} />
-      <View style={styles.topLineThree} />
-      <View style={styles.blobLeft} />
-      <View style={styles.blobRight} />
-
+    <ScreenContainer>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboard}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.phoneCard}>
-            <View style={styles.topBar}>
-              {onBackPress ? (
-                <Pressable onPress={onBackPress} style={styles.backButton}>
-                  <Text style={styles.backButtonText}>←</Text>
-                </Pressable>
-              ) : (
-                <View style={styles.backButtonSpacer} />
-              )}
-            </View>
-
-            <View style={styles.cornerWashTop} />
-            <View style={styles.cornerWashBottom} />
-            <View style={styles.dotGrid}>
-              <Text style={styles.dotRow}>• • • • • •</Text>
-              <Text style={styles.dotRow}>• • • • • •</Text>
-              <Text style={styles.dotRow}>• • • • • •</Text>
-              <Text style={styles.dotRow}>• • • • • •</Text>
-            </View>
-
-            <View style={styles.dotGridBottom}>
-              <Text style={styles.dotRow}>• • •</Text>
-              <Text style={styles.dotRow}>• • •</Text>
-              <Text style={styles.dotRow}>• • •</Text>
-              <Text style={styles.dotRow}>• • •</Text>
-            </View>
-
-            <Text style={styles.eyebrow}>{eyebrow}</Text>
-            <Text style={styles.title}>{title}</Text>
-
-            <View style={styles.formCard}>{children}</View>
-
-            {bottomHint}
-
-            <Pressable onPress={onFooterPress}>
-              <Text style={styles.footerLink}>
-                {footerText}{' '}
-                <Text style={styles.footerLinkStrong}>{footerActionLabel}</Text>
-              </Text>
+        <View style={styles.topBar}>
+          {onBackPress ? (
+            <Pressable onPress={onBackPress} style={styles.backButton}>
+              <Text style={styles.backButtonText}>←</Text>
             </Pressable>
-          </View>
-        </ScrollView>
+          ) : (
+            <View style={styles.backButtonSpacer} />
+          )}
+        </View>
+        <Text style={styles.eyebrow}>{eyebrow}</Text>
+        <Text style={styles.title}>{title}</Text>
+
+        <View style={styles.formCard}>{children}</View>
+
+        {bottomHint}
+
+        <Pressable onPress={onFooterPress}>
+          <Text style={styles.footerLink}>
+            {footerText}{' '}
+            <Text style={styles.footerLinkStrong}>{footerActionLabel}</Text>
+          </Text>
+        </Pressable>
       </KeyboardAvoidingView>
-    </View>
+    </ScreenContainer>
   );
 }
 

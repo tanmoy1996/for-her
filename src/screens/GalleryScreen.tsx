@@ -121,13 +121,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#503d47',
+    color: '#2d221f',
   },
   error: {
-    color: '#ba4c6e',
+    color: '#b5636f',
   },
   emptyState: {
-    color: '#7c6470',
+    color: '#7c6d66',
   },
   gridContent: {
     paddingTop: 8,
@@ -138,15 +138,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   gridImage: {
-    borderRadius: 16,
-    backgroundColor: '#fdf3f7',
+    borderRadius: 22,
+    backgroundColor: '#fbfaf9',
     borderWidth: 1,
-    borderColor: '#f4dce8',
-    shadowColor: '#d58ca8',
-    shadowOpacity: 0.16,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    borderColor: '#e5d8d3',
+    shadowColor: '#c8bbb7',
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   modalBackdrop: {
     flex: 1,

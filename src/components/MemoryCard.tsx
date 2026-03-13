@@ -59,22 +59,22 @@ export function MemoryCard({ memory, index }: MemoryCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fffafd',
-    borderRadius: 20,
+    backgroundColor: '#fbfaf9',
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#f4dfeb',
+    borderColor: '#e5d8d3',
     overflow: 'hidden',
     marginBottom: 14,
-    shadowColor: '#d58ca8',
-    shadowOpacity: 0.2,
+    shadowColor: '#c8bbb7',
+    shadowOpacity: 0.22,
     shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   image: {
     width: '100%',
     height: 180,
-    backgroundColor: '#fbeff4',
+    backgroundColor: '#f2ebea',
   },
   placeholder: {
     alignItems: 'center',
@@ -91,20 +91,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#4f3d46',
+    color: '#2c211e',
   },
   date: {
     fontSize: 13,
-    color: '#8b6e7d',
+    color: '#8d7d77',
   },
   author: {
     fontSize: 13,
-    color: '#cc7692',
+    color: '#ef8a8e',
     fontWeight: '700',
   },
   description: {
     fontSize: 15,
-    color: '#5e4d56',
+    color: '#625651',
     lineHeight: 21,
   },
 });

@@ -21,6 +21,7 @@ import {
 import { RootStackParamList } from '../../App';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { deleteMemory } from '../services/firebase';
+import { cancelMemoryReminderNotifications } from '../services/notifications';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MemoryDetail'>;
 
@@ -47,6 +48,7 @@ export function MemoryDetailScreen({ navigation, route }: Props) {
           onPress: async () => {
             try {
               setIsDeleting(true);
+              await cancelMemoryReminderNotifications(memory.id);
               await deleteMemory(memory.id);
               navigation.dispatch((state) => {
                 const routes = state.routes.filter((item) => {

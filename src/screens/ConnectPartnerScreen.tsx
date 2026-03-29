@@ -65,6 +65,17 @@ export function ConnectPartnerScreen({ navigation }: Props) {
   return (
     <ScreenContainer>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.topBar}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>←</Text>
+          </Pressable>
+
+          <View style={styles.backButtonSpacer} />
+        </View>
+
         <Text style={styles.title}>Connect your accounts</Text>
         <Text style={styles.subtitle}>Each person keeps their own login. Once linked, both memories show up in the same timeline.</Text>
 
@@ -107,6 +118,34 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 24,
     gap: 14,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#fbfaf9',
+    borderWidth: 1,
+    borderColor: '#e5d8d3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#c8bbb7',
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: '#7a655d',
+    lineHeight: 24,
+  },
+  backButtonSpacer: {
+    width: 44,
   },
   title: {
     fontSize: 28,

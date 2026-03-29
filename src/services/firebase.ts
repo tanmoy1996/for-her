@@ -83,6 +83,7 @@ export type Memory = {
   description: string;
   date: string;
   imageUrl: string;
+  remindEveryYear: boolean;
   createdAt: number;
 };
 
@@ -358,6 +359,7 @@ export async function addMemory(memory: MemoryInput): Promise<Memory> {
     description: memory.description,
     date: memory.date,
     imageUrl: memory.imageUrl,
+    remindEveryYear: memory.remindEveryYear ?? false,
     createdAt: memory.createdAt ?? Date.now(),
   };
 
@@ -370,7 +372,9 @@ export async function addMemory(memory: MemoryInput): Promise<Memory> {
 
 export async function updateMemory(
   memoryId: string,
-  memory: Partial<Pick<Memory, 'title' | 'description' | 'date' | 'imageUrl'>>,
+  memory: Partial<
+    Pick<Memory, 'title' | 'description' | 'date' | 'imageUrl' | 'remindEveryYear'>
+  >,
 ): Promise<void> {
   await updateDoc(doc(firestore, 'memories', memoryId), memory);
 }
@@ -387,7 +391,7 @@ export async function getMemories(relationshipId: string): Promise<Memory[]> {
   const snapshot = await getDocs(memoriesQuery);
 
   return snapshot.docs
-    .map((item) => item.data() as Memory)
+    .map((item) => toMemory(item.data() as Partial<Memory>))
     .sort((a, b) => b.createdAt - a.createdAt);
 }
 
@@ -462,6 +466,21 @@ function toSession(user: UserAccount): UserSession {
     username: user.username,
     relationshipId: user.relationshipId ?? null,
     partnerId: user.partnerId ?? null,
+  };
+}
+
+function toMemory(memory: Partial<Memory>): Memory {
+  return {
+    id: memory.id ?? '',
+    relationshipId: memory.relationshipId ?? '',
+    authorId: memory.authorId ?? '',
+    authorName: memory.authorName ?? '',
+    title: memory.title ?? '',
+    description: memory.description ?? '',
+    date: memory.date ?? '',
+    imageUrl: memory.imageUrl ?? '',
+    remindEveryYear: memory.remindEveryYear ?? false,
+    createdAt: memory.createdAt ?? Date.now(),
   };
 }
 

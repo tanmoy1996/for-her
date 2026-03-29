@@ -10,6 +10,7 @@ import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -22,8 +23,11 @@ import { MemoryCard } from '../components/MemoryCard';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useSharedAccount } from '../hooks/useSharedAccount';
 import { getMemories, Memory } from '../services/firebase';
+import { syncMemoryReminderNotifications } from '../services/notifications';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Timeline'>;
+
+const emptyStateImage = require('../assets/image/landingImage.png');
 
 export function TimelineScreen({ navigation }: Props) {
   const [fontsLoaded] = useFonts({
@@ -70,10 +74,11 @@ export function TimelineScreen({ navigation }: Props) {
         if (withRefreshing) {
           setIsRefreshing(true);
         } else {
-          setIsLoading(true);
+        setIsLoading(true);
         }
         setErrorMessage(null);
         const data = await getMemories(session.relationshipId);
+        await syncMemoryReminderNotifications(data);
         setMemories(data);
       } catch (error) {
         setErrorMessage('Could not load memories right now.');
@@ -115,17 +120,6 @@ export function TimelineScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
-      <View style={styles.actionRow}>
-        {!session?.relationshipId ? (
-          <Pressable
-            style={styles.actionPill}
-            onPress={() => navigation.navigate('ConnectPartner')}
-          >
-            <Text style={styles.actionPillText}>Create or Enter Rel. Code</Text>
-          </Pressable>
-        ) : null}
-      </View>
-
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -164,26 +158,42 @@ export function TimelineScreen({ navigation }: Props) {
         }
         ListEmptyComponent={
           !isLoading ? (
-            <View style={styles.emptyCard}>
+            <View>
+            <Pressable
+            style={styles.emptyCard}
+            onPress={() =>
+              navigation.navigate(
+                session?.relationshipId ? 'AddMemory' : 'ConnectPartner',
+              )
+            }
+          >
+              <Image
+                source={emptyStateImage}
+                style={styles.emptyImage}
+                resizeMode="cover"
+              />
               <Text style={styles.emptyTitle}>
-                {session?.relationshipId ? 'No memories yet' : 'Connect first'}
+                {session?.relationshipId ? 'No memories yet' : 'Connect First'}
               </Text>
               <Text style={styles.emptySubtitle}>
                 {session?.relationshipId
                   ? 'Tap + to add your first memory.'
                   : 'Link your person to unlock a shared timeline.'}
               </Text>
+          </Pressable>
             </View>
           ) : null
         }
       />
 
-      <Pressable
+    {session?.relationshipId ? 
+      (<Pressable
         style={styles.bottomButton}
         onPress={() => navigation.navigate('AddMemory')}
       >
         <Text style={styles.bottomButtonText}>Add A Memory</Text>
-      </Pressable>
+      </Pressable>):null}
+
     </ScreenContainer>
   );
 }
@@ -255,6 +265,7 @@ const styles = StyleSheet.create({
     fontSize: 38,
     color: '#2a211d',
     marginBottom: 8,
+    textTransform:'lowercase'
   },
   heroTitleFont: {
     fontFamily: 'PlayfairDisplay_700Bold',
@@ -367,15 +378,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 4,
   },
+  emptyImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 20,
+    marginBottom: 16,
+  },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#2f241f',
+    textAlign: 'center',
   },
   emptySubtitle: {
     marginTop: 6,
     fontSize: 14,
     color: '#85746c',
+    textAlign: 'center',
   },
   bottomButton: {
     position: 'absolute',

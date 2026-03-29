@@ -23,6 +23,7 @@ import { RootStackParamList } from '../../App';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useSharedAccount } from '../hooks/useSharedAccount';
 import { addMemory, updateMemory, uploadImage } from '../services/firebase';
+import { refreshMemoryReminderNotifications } from '../services/notifications';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddMemory'>;
 
@@ -38,6 +39,9 @@ export function AddMemoryScreen({ navigation, route }: Props) {
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(memoryToEdit?.imageUrl ?? null);
+  const [remindEveryYear, setRemindEveryYear] = useState(
+    memoryToEdit?.remindEveryYear ?? false,
+  );
   const [isPickingImage, setIsPickingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -51,6 +55,7 @@ export function AddMemoryScreen({ navigation, route }: Props) {
     setDescription(memoryToEdit.description);
     setSelectedDate(dayjs(memoryToEdit.date).toDate());
     setImageUri(memoryToEdit.imageUrl || null);
+    setRemindEveryYear(memoryToEdit.remindEveryYear ?? false);
   }, [memoryToEdit]);
 
   const pickImage = async () => {
@@ -121,6 +126,7 @@ export function AddMemoryScreen({ navigation, route }: Props) {
           description: description.trim(),
           date: dayjs(selectedDate).format('YYYY-MM-DD'),
           imageUrl,
+          remindEveryYear,
         };
 
         await updateMemory(memoryToEdit.id, {
@@ -128,7 +134,9 @@ export function AddMemoryScreen({ navigation, route }: Props) {
           description: updatedMemory.description,
           date: updatedMemory.date,
           imageUrl: updatedMemory.imageUrl,
+          remindEveryYear: updatedMemory.remindEveryYear,
         });
+        await refreshMemoryReminderNotifications(updatedMemory);
 
         navigation.dispatch((state) => {
           const routes = state.routes
@@ -164,7 +172,7 @@ export function AddMemoryScreen({ navigation, route }: Props) {
         return;
       }
 
-      await addMemory({
+      const createdMemory = await addMemory({
         relationshipId: session.relationshipId,
         authorId: session.userId,
         authorName: session.username,
@@ -172,7 +180,10 @@ export function AddMemoryScreen({ navigation, route }: Props) {
         description: description.trim(),
         date: dayjs(selectedDate).format('YYYY-MM-DD'),
         imageUrl,
+        remindEveryYear,
       });
+
+      await refreshMemoryReminderNotifications(createdMemory);
 
       navigation.navigate('Timeline');
     } catch (error) {
@@ -293,6 +304,28 @@ export function AddMemoryScreen({ navigation, route }: Props) {
             textAlignVertical="top"
             placeholderTextColor="#9f8a94"
           />
+
+          <Pressable
+            style={styles.reminderCard}
+            onPress={() => setRemindEveryYear((currentValue) => !currentValue)}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                remindEveryYear && styles.checkboxChecked,
+              ]}
+            >
+              {remindEveryYear ? (
+                <Text style={styles.checkboxIcon}>✓</Text>
+              ) : null}
+            </View>
+            <View style={styles.reminderTextWrap}>
+              <Text style={styles.reminderTitle}>Remind me every year</Text>
+              <Text style={styles.reminderSubtitle}>
+                Send a 9:00 AM anniversary reminder based on this memory.
+              </Text>
+            </View>
+          </Pressable>
 
           {errorMessage ? (
             <Text style={styles.errorText}>{errorMessage}</Text>
@@ -452,6 +485,51 @@ const styles = StyleSheet.create({
   },
   multilineInput: {
     minHeight: 120,
+  },
+  reminderCard: {
+    marginTop: 6,
+    borderWidth: 1,
+    borderColor: '#e5d8d3',
+    borderRadius: 20,
+    backgroundColor: '#fbfaf9',
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#d9b4bd',
+    backgroundColor: '#fffaf9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#ef8a8e',
+    borderColor: '#ef8a8e',
+  },
+  checkboxIcon: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  reminderTextWrap: {
+    flex: 1,
+  },
+  reminderTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#4a3f3b',
+  },
+  reminderSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#8a7a74',
   },
   errorText: {
     color: '#b5636f',
